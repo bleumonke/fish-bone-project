@@ -15,20 +15,31 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from 'react-router-dom';
 import { MenuItem } from '../types';
 
+// Import your auth store hook
+import { useAuthStore } from '../store/useAuthStore';
+
+const drawerWidth = 220;
+
 interface SidebarProps {
   menuItems: MenuItem[];
 }
-
-const drawerWidth = 220;
 
 const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
+  const logout = useAuthStore(state => state.logout);
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
+  const handleNavigate = (item: MenuItem) => {
+    if (item.label.toLowerCase() === 'logout') {
+      // Call logout action
+      logout();
+      // Redirect to login
+      navigate('/login');
+    } else if (item.button) {
+      navigate(item.path);
+    }
     if (isMobile) setMobileOpen(false);
   };
 
@@ -39,18 +50,16 @@ const Sidebar: React.FC<SidebarProps> = ({ menuItems }) => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        backgroundColor:'royalblue',
-        color:'white',
+        backgroundColor: 'royalblue',
+        color: 'white',
       }}
     >
       <List>
         {menuItems.map((item, idx) => (
           <ListItem key={idx} disablePadding>
-            <ListItemButton onClick={() => item.button && handleNavigate(item.path)}>
+            <ListItemButton onClick={() => handleNavigate(item)}>
               {item.icon && (
-                <ListItemIcon sx={{ color:'white'}}>
-                  {item.icon}
-                </ListItemIcon>
+                <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
               )}
               <ListItemText primary={item.label} />
             </ListItemButton>

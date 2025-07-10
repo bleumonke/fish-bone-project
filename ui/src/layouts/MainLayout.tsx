@@ -8,7 +8,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 const menuItems: MenuItem[] = [
   { label: 'Home', path: '/', button: true, icon: <HomeIcon /> },
-  { label: 'Logout', path: '/logout', button: true, icon: <ExitToAppIcon /> },
+  { label: 'Logout', path: '/login', button: true, icon: <ExitToAppIcon /> },
 ];
 
 const MainLayout: React.FC = () => {

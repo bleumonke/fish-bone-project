@@ -1,0 +1,51 @@
+version: '3.8'
+
+networks:
+  fishbone-network:
+    driver: bridge
+
+services:
+  ui:
+    build:
+      context: ./ui
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: yarn start
+    networks:
+      - fishbone-network
+
+  services:
+    build:
+      context: ./services
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/postgres
+    volumes:
+      - ./services:/app
+    networks:
+      - fishbone-network
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - fishbone-network
+
+volumes:
+  pgdata:

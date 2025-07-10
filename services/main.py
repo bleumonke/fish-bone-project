@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import diagram
+from routes import diagram, auth
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
 
@@ -15,7 +15,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(diagram.router)
+
 
 @app.get("/health")
 def health_check():

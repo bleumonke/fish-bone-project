@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDiagramStore } from '../store/useDiagramStore';
 import Notification from '../components/Notification';
 import { Bone } from '../types';
+import { useAuthStore } from '../store/useAuthStore';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -24,12 +25,26 @@ const Home: React.FC = () => {
   // Zustand store hooks
   const { diagrams, loading, error, fetchDiagrams, addDiagram } = useDiagramStore();
 
+  // Auth store hooks including token, user and fetchUserProfile
+  const token = useAuthStore(state => state.token);
+  const user = useAuthStore(state => state.user);
+  const fetchUserProfile = useAuthStore(state => state.fetchUserProfile);
+
   const [search, setSearch] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [newDiagramName, setNewDiagramName] = useState('');
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
+
+  // Fetch user profile on mount if token exists but user data missing
+  useEffect(() => {
+    if (token && !user) {
+      fetchUserProfile().catch(() => {
+        // Optional: handle fetch profile error here
+      });
+    }
+  }, [token, user, fetchUserProfile]);
 
   useEffect(() => {
     fetchDiagrams();
@@ -221,6 +236,12 @@ const Home: React.FC = () => {
           boxSizing: 'border-box',
         }}
       >
+        {user && user.fullName && (
+          <Typography variant="subtitle1" mb={2} color="text.secondary">
+            Welcome, {user.fullName}!
+          </Typography>
+        )}
+
         <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
           <Typography variant="h5" mb={2}>
             Ishwaka Diagrams
