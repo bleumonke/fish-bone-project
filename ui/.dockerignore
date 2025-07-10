@@ -1,0 +1,49 @@
+# Node modules (installed inside the container)
+node_modules
+**/node_modules
+
+# Yarn cache
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Build output
+build
+dist
+
+# TypeScript output
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Misc
+.DS_Store
+.git
+.gitignore
+.vscode
+.idea
+*.md
+
+# Tests and coverage
+coverage
+*.test.*
+*.spec.*
+
+# Dockerfile and docker-compose files if not needed inside the context
+Dockerfile*
+docker-compose*
+
+# Other system files
+*.bak
+*.swp

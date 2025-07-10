@@ -31,6 +31,8 @@ fish-bone-project/
 - Optional (if running frontend without Docker):
   - [Node.js](https://nodejs.org/) (version 16+ recommended)
   - [Yarn](https://yarnpkg.com/)
+- - Optional (if running backend without Docker):
+  - [Poetry](https://python-poetry.org)
 
 ## Running the Project
 
