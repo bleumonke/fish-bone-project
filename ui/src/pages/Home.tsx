@@ -22,10 +22,7 @@ import { useAuthStore } from '../store/useAuthStore';
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
-  // Zustand store hooks
   const { diagrams, loading, error, fetchDiagrams, addDiagram } = useDiagramStore();
-
-  // Auth store hooks including token, user and fetchUserProfile
   const token = useAuthStore(state => state.token);
   const user = useAuthStore(state => state.user);
   const fetchUserProfile = useAuthStore(state => state.fetchUserProfile);
@@ -37,12 +34,9 @@ const Home: React.FC = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationSeverity, setNotificationSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
 
-  // Fetch user profile on mount if token exists but user data missing
   useEffect(() => {
     if (token && !user) {
-      fetchUserProfile().catch(() => {
-        // Optional: handle fetch profile error here
-      });
+      fetchUserProfile().catch(() => {});
     }
   }, [token, user, fetchUserProfile]);
 
@@ -107,7 +101,6 @@ const Home: React.FC = () => {
     }, 0);
   };
 
-  // Filter and prepare rows for DataGrid
   const filteredRows = diagrams
     .filter(({ title }) => title.toLowerCase().includes(search.toLowerCase()))
     .map(({ id, title, createdBy, createdAt, updatedAt, bones }) => ({
@@ -226,33 +219,51 @@ const Home: React.FC = () => {
 
   return (
     <>
+      {/* Greeting top-right */}
+      {user?.fullName && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            bgcolor: 'background.paper',
+            px: 2,
+            py: 1,
+            borderRadius: 2,
+            boxShadow: 3,
+            zIndex: 1300,
+            userSelect: 'none',
+          }}
+        >
+          <Typography variant="subtitle1" color="text.primary">
+            Welcome, {user.fullName}!
+          </Typography>
+        </Box>
+      )}
+
+      {/* Main centered container */}
       <Box
         sx={{
+          height: '100vh',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          minHeight: '100vh',
           px: 2,
           boxSizing: 'border-box',
         }}
       >
-        {user && user.fullName && (
-          <Typography variant="subtitle1" mb={2} color="text.secondary">
-            Welcome, {user.fullName}!
-          </Typography>
-        )}
-
-        <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto' }}>
-          <Typography variant="h5" mb={2}>
+        <Box sx={{ width: '100%', maxWidth: 1200 }}>
+          <Typography variant="h4" mb={2} align="left">
             Ishwaka Diagrams
           </Typography>
+
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
               alignItems: 'center',
-              mb: 2,
               gap: 2,
+              mb: 3,
               flexWrap: 'wrap',
             }}
           >
@@ -262,15 +273,15 @@ const Home: React.FC = () => {
               size="small"
               value={search}
               onChange={handleSearchChange}
-              sx={{ flex: '1 1 250px', minWidth: 200 }}
+              sx={{ width: '300px', maxWidth: '100%' }}
               disabled={loading}
             />
             <Button
               variant="contained"
               color="primary"
               onClick={handleAddDiagramClick}
-              sx={{ flexShrink: 0 }}
               disabled={loading}
+              sx={{ whiteSpace: 'nowrap' }}
             >
               Add Diagram
             </Button>
@@ -281,42 +292,39 @@ const Home: React.FC = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <Box sx={{ width: '100%' }}>
-              <DataGrid
-                rows={filteredRows}
-                columns={columns}
-                pageSizeOptions={[5]}
-                initialState={{
-                  pagination: { paginationModel: { pageSize: 5, page: 0 } },
-                }}
-                onRowClick={handleRowClick}
-                autoHeight
-                sx={{
-                  width: '100%',
-                  '& .MuiDataGrid-row:hover': {
-                    cursor: 'pointer',
-                  },
-                  overflowX: 'auto',
-                }}
-                slots={{
-                  noRowsOverlay: () => (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '100%',
-                        color: 'text.secondary',
-                      }}
-                    >
-                      <InboxIcon sx={{ fontSize: 50, mb: 1 }} />
-                      <Typography>No diagrams found</Typography>
-                    </Box>
-                  ),
-                }}
-              />
-            </Box>
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              pageSizeOptions={[5]}
+              initialState={{
+                pagination: { paginationModel: { pageSize: 5, page: 0 } },
+              }}
+              onRowClick={handleRowClick}
+              autoHeight
+              sx={{
+                '& .MuiDataGrid-row:hover': {
+                  cursor: 'pointer',
+                },
+                overflowX: 'auto',
+              }}
+              slots={{
+                noRowsOverlay: () => (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '100%',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    <InboxIcon sx={{ fontSize: 50, mb: 1 }} />
+                    <Typography>No diagrams found</Typography>
+                  </Box>
+                ),
+              }}
+            />
           )}
         </Box>
       </Box>
