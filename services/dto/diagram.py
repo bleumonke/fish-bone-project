@@ -3,7 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class BoneChild(BaseModel):
-    id: str                  # Add id here
+    id: str
     name: str
     createdBy: str
 
@@ -11,7 +11,7 @@ class BoneChild(BaseModel):
         from_attributes = True
 
 class Bone(BaseModel):
-    id: str                  # Add id here
+    id: str
     name: str
     createdBy: Optional[str]
     children: List[BoneChild] = []

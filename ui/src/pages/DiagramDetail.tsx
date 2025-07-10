@@ -9,6 +9,7 @@ import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 import { Bone } from '../types';
 import IshikawaDiagram from '../components/IshikawaDiagram';
 import { useDiagramStore } from '../store/useDiagramStore';
+import Notification from '../components/Notification';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,6 +32,29 @@ const DiagramDetail: React.FC = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
   const titleInputRef = useRef<HTMLInputElement>(null);
+
+  const [confirmDiagramDeleteOpen, setConfirmDiagramDeleteOpen] = useState(false);
+
+  const [notification, setNotification] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'info' | 'warning' | 'error';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
+
+  const showNotification = (
+    message: string,
+    severity: 'success' | 'info' | 'warning' | 'error' = 'info'
+  ) => {
+    setNotification({ open: true, message, severity });
+  };
+
+  const handleCloseNotification = () => {
+    setNotification((prev) => ({ ...prev, open: false }));
+  };
 
   useEffect(() => {
     if (id) getDiagram(id);
@@ -80,6 +104,7 @@ const DiagramDetail: React.FC = () => {
     }
     if (trimmedTitle !== diagram.title) {
       updateDiagram(diagram.id, { title: trimmedTitle });
+      showNotification('Title updated successfully', 'success');
     }
     setIsEditingTitle(false);
   };
@@ -113,7 +138,10 @@ const DiagramDetail: React.FC = () => {
     };
     const updatedBones = [...bones, newBone];
     setBones(updatedBones);
-    if (diagram) updateDiagram(diagram.id, { bones: updatedBones });
+    if (diagram) {
+      updateDiagram(diagram.id, { bones: updatedBones });
+      showNotification('Root bone added', 'success');
+    }
   };
 
   const handleAddChild = (parentId: string) => {
@@ -141,7 +169,10 @@ const DiagramDetail: React.FC = () => {
 
     const updatedBones = addChild(bones);
     setBones(updatedBones);
-    if (diagram) updateDiagram(diagram.id, { bones: updatedBones });
+    if (diagram) {
+      updateDiagram(diagram.id, { bones: updatedBones });
+      showNotification('Child bone added', 'success');
+    }
   };
 
   const handleDeleteBoneRequest = (boneId: string) => {
@@ -153,6 +184,7 @@ const DiagramDetail: React.FC = () => {
     const updatedBones = deleteBoneById(bones, deleteTarget);
     setBones(updatedBones);
     updateDiagram(diagram.id, { bones: updatedBones });
+    showNotification('Bone deleted', 'error');
     setDeleteTarget(null);
   };
 
@@ -163,14 +195,33 @@ const DiagramDetail: React.FC = () => {
   const handleLabelChange = (id: string, newName: string) => {
     const updatedBones = updateBoneName(bones, id, newName);
     setBones(updatedBones);
-    if (diagram) updateDiagram(diagram.id, { bones: updatedBones });
+    if (diagram) {
+      updateDiagram(diagram.id, { bones: updatedBones });
+      showNotification('Bone name updated', 'success');
+    }
   };
 
-  const handleDeleteDiagram = async () => {
+  const handleDeleteDiagramRequest = () => {
+    setConfirmDiagramDeleteOpen(true);
+  };
+
+  const confirmDiagramDeletion = async () => {
     if (!diagram) return;
     await deleteDiagram(diagram.id);
+    showNotification('Diagram deleted', 'error');
     navigate('/');
+    setConfirmDiagramDeleteOpen(false);
   };
+
+  const cancelDiagramDeletion = () => {
+    setConfirmDiagramDeleteOpen(false);
+  };
+
+  useEffect(() => {
+    if (error) {
+      showNotification(error, 'error');
+    }
+  }, [error]);
 
   if (!diagram) {
     return (
@@ -193,7 +244,7 @@ const DiagramDetail: React.FC = () => {
           <Button
             color="error"
             startIcon={<DeleteForeverIcon />}
-            onClick={handleDeleteDiagram}
+            onClick={handleDeleteDiagramRequest}
             variant="outlined"
           >
             Delete
@@ -246,17 +297,27 @@ const DiagramDetail: React.FC = () => {
         </Box>
       </Box>
 
+      {/* Bone Delete Dialog */}
       <ConfirmDeleteDialog
         open={!!deleteTarget}
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
       />
 
-      {error && (
-        <Typography color="error" sx={{ mt: 1 }}>
-          Error: {error}
-        </Typography>
-      )}
+      {/* Diagram Delete Dialog */}
+      <ConfirmDeleteDialog
+        open={confirmDiagramDeleteOpen}
+        onCancel={cancelDiagramDeletion}
+        onConfirm={confirmDiagramDeletion}
+      />
+
+      {/* Snackbar Notification */}
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        severity={notification.severity}
+        onClose={handleCloseNotification}
+      />
     </Box>
   );
 };
