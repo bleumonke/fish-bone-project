@@ -18,7 +18,6 @@ root.render(
       <Routes>
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/signup" element={<AuthPage mode="signup" />} />
-
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="diagram/:id" element={<DiagramDetail />} />

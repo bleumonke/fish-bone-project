@@ -172,13 +172,11 @@ const CustomTreeItem: React.FC<CustomTreeItemProps> = ({
                 <PersonIcon sx={{ fontSize: 14 }} />
               </Avatar>
             </Tooltip>
-            {isRoot && (
-              <Tooltip title="Add child">
-                <IconButton size="small" onClick={handleAddChildClick}>
-                  <AddIcon fontSize="small" color="primary" />
-                </IconButton>
-              </Tooltip>
-            )}
+            <Tooltip title="Add child">
+              <IconButton size="small" onClick={handleAddChildClick}>
+                <AddIcon fontSize="small" color="primary" />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Delete bone">
               <IconButton size="small" onClick={handleDeleteClick}>
                 <DeleteIcon fontSize="small" color="error" />
