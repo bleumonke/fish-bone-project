@@ -3,7 +3,10 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from contextlib import asynccontextmanager
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg2://subramanyammogili:password@localhost:5432/subramanyammogili")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL is None:
+    raise RuntimeError("DATABASE_URL is required")
 
 
 engine = create_engine(DATABASE_URL, echo=True)
