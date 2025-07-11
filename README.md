@@ -89,3 +89,14 @@ This is configured automatically in Docker Compose.
 ### 6. Swagger UI:
 Once the backend is up and running you can access the swagger ui using
 http://localhost:8080/docs
+
+
+### 7. ERD
+![ERD Diagram for the databse tables](assets/ERD.png)
+
+
+### 7. Application Demo
+![Landing page](assets/1.png)
+![Detailed Structure page](assets/2.png)
+![Login Page](assets/3.jpeg)
+![Sign up page](assets/4.jpeg)
